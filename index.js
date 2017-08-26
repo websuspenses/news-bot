@@ -1,12 +1,21 @@
-var builder = require('botbuilder');
+var builder = require('botbuilder'); 
+var restify = require('restify'); 
 var apiairecognizer = require('api-ai-recognizer'); 
-var connector = new builder.ConsoleConnector().listen(); 
+var request = require('request'); 
+//========================================================= 
+//// Bot Setup //========================================================= 
+//// Setup Restify Server
+var server = restify.createServer(); 
+server.listen(process.env.port || process.env.PORT || 3978, function () { console.log('%s listening to %s', server.name, server.url); }); 
+// Create chat bot 
+var connector = new builder.ChatConnector({ appId: '0e4f90c9-79c3-41a5-aafa-2dab4a3e122a', appPassword: 'FiZiGjx8JnV8eiXfFOVeaZZ' });
+
 var bot = new builder.UniversalBot(connector); 
 var recognizer = new apiairecognizer('27ee325d2df741edb1ebd929c9a45297'); 
 var intents = new builder.IntentDialog({ recognizers: [recognizer] }); 
-var request = require('request');
 var botHelper = require('./helpers/botHelper');
-bot.dialog('/',intents); 
+bot.dialog('/',intents);
+
 //intents.matches('news.search',
 //        function(session){ 
 //            session.send("Opening First article"); 
@@ -32,7 +41,7 @@ intents.matches('news.search', [function (session, args) {
             var articles = res.articles;
             
             botHelper.showNews(res,session);
-        })
+        });
         } else {
             builder.Prompts.text(session, 'Which news do you want for?');
         }
@@ -41,7 +50,7 @@ intents.matches('news.search', [function (session, args) {
             var articles = res.articles;
             
             botHelper.showNews(res,session);
-        })
+        });
         //session.send("No News in " + results.response);
     }]);
 
